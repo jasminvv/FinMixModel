@@ -4,12 +4,19 @@ shinyUI(fluidPage(
   
   tabsetPanel(
               tabPanel("Home Page", 
-                fluidPage()),
+                fluidPage(mainPanel(
+                  h3("Finite Mixture Model Calculation"),
+                  p("With this application, you can fit a mixture model of multiple gaussians to data you upload or simulate. 
+                    The application uses the EM approach. To start, go to the [link to upload page) or [link to simulation page].
+                    For further information, see the [link to user manual].")
+                ))),
   
               tabPanel("Upload Data", 
                 fluidPage(mainPanel(
                   "Upload Data",
                   fileInput("data.file", NULL, accept = c("plain", "x-excel")),
+                  numericInput("sim.num.subpopulations", "Number of subpopulations", 2, min = 1, max = 10, step = 1),
+                  numericInput("sim.max.times", "Maximum number of iterations", 1500, min = 1, max = 5000, step = 1),
                   actionButton("data.calculate", "Calculate")
               ))),
   
@@ -29,11 +36,22 @@ shinyUI(fluidPage(
              
                 sidebarPanel(
                   plotOutput("sim.plot"),
+                  numericInput("sim.num.subpopulations", "Number of subpopulations", 2, min = 1, max = 10, step = 1),
+                  numericInput("sim.max.times", "Maximum number of iterations", 1500, min = 1, max = 5000, step = 1),
                   actionButton("sim.calculate", "Calculate")
                 )
               ))),
   
               tabPanel("Results", 
-                fluidPage()))
+                fluidPage(sidebarLayout(
+                mainPanel(
+                  plotOutput("res.plot")
+                ),
+                
+                sidebarPanel(
+                  h4("Results"),
+                  tableOutput("res.table")
+                )
+                )))
 
-))
+)))

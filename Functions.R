@@ -16,6 +16,16 @@ SetDrawProbability <- function(priors) {
   return(draw.p)
 }
 
+NormalizePriors <- function(priors) {
+  # Function that takes in a vector containing the priors, and returns a
+  # vector containing the normalized priors, so that they add up to 1.
+  norm.priors <- vector(mode = "numeric", length = length(priors))
+  for (b in seq_along(priors)) {
+    norm.priors[b] <- priors[b]/sum(priors)
+  }
+  return(norm.priors)
+}
+
 SimulateDataset <- function(means, std.devs, priors, sample.size) {
   # Function that takes a vector of k means, a vector of k standard deviations,
   # a vector of k priors, and a sample size n. It returns a vector of n simulated 
@@ -38,14 +48,29 @@ SimulateDataset <- function(means, std.devs, priors, sample.size) {
 }
 
 PlotSimulation <- function(data, means, std.devs, priors){
+  # Function that takes vectors containing the data values, means, 
+  # standard deviations and priors, and produces a plot containing
+  # either nothing, a histogram of the data, and/or curves showing 
+  # the subpopulations and total population
+  priors <- NormalizePriors(priors)
+  colors.plot <- c("aquamarine3", "darkgoldenrod3", "lightpink2", "cornflowerblue", "darkolivegreen4", "mistyrose3", "khaki3", "mediumpurple3", "slateblue2", "coral2")
+  #densities <- vector(mode = numeric, length = (max(means) + max(std.devs) * 3) - (min(means) - max(std.devs) * 3))
   plot(1, type = "n", xlab = "", ylab = "", xlim = c(min(means) - max(std.devs) * 3, max(means) + max(std.devs) * 3), ylim = c(0, 1))
   if (length(data) > 0) {  
-    hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of Data and Density Graphs for Subpopulations")
-  }
+    hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of sample, and density graphs for populations", border = "grey80", col = "grey90")
+    #densities <- vector(mode = numeric, length = max(data) - min(data))
+    }
   if (length(means) > 0 && length(std.devs) > 0 && length(priors) > 0) {
     for (b in seq_along(means)) {
-      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], add = TRUE)
+      if (b == 1) {
+        #densities <- dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b]
+      }
+      else {
+        #densities <- densities + dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b]
+      }
+      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], add = TRUE, col = colors.plot[b])
     }
+    
   }
 }
 
@@ -152,7 +177,7 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
     est.vars <- CalculateEstVars(data, p.membership, est.means, est.vars)
   }
   
-  mixture.model <- list("est.means" = est.means, "est.vars" = est.vars, "p.membership" = p.membership)
+  mixture.model <- list("est.means" = est.means, "est.vars" = est.vars, "est.priors" = est.priors, "p.membership" = p.membership)
   
   return(mixture.model)
 }
@@ -160,12 +185,8 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
 # PLOT RESULTS
 
 PlotResults <- function(data, est.means, est.vars, est.priors){
-  if (! missing(data)) {  
-    hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of Data and Density Graphs for Subpopulations")
-  }
-  if (length(est.means) > 0 && length(est.vars) > 0 && length(est.priors) > 0) {
-    for (b in seq_along(est.means)) {
-      curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], add = TRUE)
-    }
+  hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of Data and Density Graphs for Subpopulations")
+  for (b in seq_along(est.means)) {
+    curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], add = TRUE)
   }
 }
