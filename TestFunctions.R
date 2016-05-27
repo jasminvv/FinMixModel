@@ -22,8 +22,8 @@ source("Functions.R")
 # InitiateEstPriors(2)
 
 k.subs <- 2
-means <- c(7, 12)
-vars <- c(1, 2) 
+means <- c(300, 200)
+vars <- c(100, 100) 
 priors <- c(0.5, 0.5)
 sample.size <- 100
 # # data <- c(1,2,2,2,3,5,34,35,36,40,40,40,45)
@@ -44,8 +44,8 @@ sample.size <- 100
 # est.std.devs <- CalculateEstSDSubpopulation(data, p.membership, est.means, est.std.devs)
 
 data <- SimulateDataset(means, vars, priors, sample.size)
-mixture.model <- RunMixtureModel(data, k.subs, 2000)
-PlotResults(data, mixture.model)
+mixture.model <- RunMixtureModel(data, k.subs, 500)
+PlotResults(data, mixture.model$est.means, mixture.model$est.vars, mixture.model$est.priors )
 
 
 
