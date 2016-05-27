@@ -206,14 +206,32 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
   # belongs to one of the subpopulations(rows) and the BIC fitness measure
   n.obs        <- length(data)
   est.means    <- InitiateEstMeans(num.subpopulations, data)
-  est.vars <- InitiateEstVars(num.subpopulations, data)
+  est.vars     <- InitiateEstVars(num.subpopulations, data)
   est.priors   <- InitiateEstPriors(num.subpopulations)
   p.membership <- InitiatePMembership(num.subpopulations, n.obs)
+  old.means    <- vector(mode = "numeric", length = length(est.means))
+  old.vars     <- vector(mode = "numeric", length = length(est.vars))
+  converged    <- vector(mode = "logical", length = length(est.means))
   
   for (n in 1:max.times) {
-    p.membership <- CalculatePMemberships(data, est.vars, est.means, est.priors, p.membership)
-    est.means    <- CalculateEstMeans(data, p.membership, est.means)
-    est.vars <- CalculateEstVars(data, p.membership, est.means, est.vars)
+    for (b in length(est.means)) {
+      if (est.means[b] < old.means[b] * 1.001 && est.means[b] > old.means[b] * 0.999 && est.vars[b] < old.vars[b] * 1.001 && est.vars[b] > old.vars[b] * 0.999){
+        converged[b] <- TRUE
+      }
+      else {
+        converged[b] <- FALSE
+      }
+    }
+    if (all(converged)){
+      break
+    }
+    else {
+      p.membership <- CalculatePMemberships(data, est.vars, est.means, est.priors, p.membership)
+      old.means    <- est.means
+      old.vars     <- est.vars
+      est.means    <- CalculateEstMeans(data, p.membership, est.means)
+      est.vars     <- CalculateEstVars(data, p.membership, est.means, est.vars)
+    }
   }
   BIC <- CalculateBIC(data, est.means, p.membership)
   
@@ -222,7 +240,7 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
   return(mixture.model)
 }
 
-# PLOT RESULTS
+# PLOT RESULTS: Function: PlotResults
 
 PlotResults <- function(data, est.means, est.vars, est.priors){
   # Function that takes a vector containing the data, and vectors
