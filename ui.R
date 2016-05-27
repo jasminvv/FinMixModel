@@ -28,8 +28,8 @@ shinyUI(fluidPage(
                 fluidPage(fluidRow(
                 column(3,
                   h3("Choose Parameters"),
-                  numericInput("sim.mean", "Mean", 1, min = 0, max = 1000, step = 1),
-                  numericInput("sim.std.dev", "Standard Deviation", 1, min = 0, max = 333, step = 0.1),
+                  numericInput("sim.mean", "Mean", 1, min = 0, max = 1000, step = 0.01),
+                  numericInput("sim.std.dev", "Standard Deviation", 1, min = 0, max = 333, step = 0.01),
                   numericInput("sim.prior", "Weight", 1, min = 0, max = 1, step = 0.01),
                   actionButton("sim.add.gaussian", "Add"),
                   actionButton("sim.reset", "Reset"),

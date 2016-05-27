@@ -27,7 +27,8 @@ ReadData <- function(filepath, filename) {
 SetDrawProbability <- function(priors) {
   # Function that takes a vector of k priors, and returns a 
   # vector where the priors are added up and divided by the total
-  # (newprior2 = prior1+2/total, newprior3 = newprior2+prior3/total, etc)
+  # (newprior2 = prior1+2/total, newprior3 = newprior2+prior3/total,
+  # etc)
   draw.p <- vector(mode = "numeric", length = length(priors))
   for (b in seq_along(priors)) {
     if (b == 1) {
@@ -41,8 +42,8 @@ SetDrawProbability <- function(priors) {
 }
 
 NormalizePriors <- function(priors) {
-  # Function that takes in a vector containing the priors, and returns a
-  # vector containing the normalized priors, so that they add up to 1.
+  # Function that takes in a vector containing the priors, and returns 
+  # a vector containing the normalized priors, so that they add up to 1.
   norm.priors <- vector(mode = "numeric", length = length(priors))
   for (b in seq_along(priors)) {
     norm.priors[b] <- priors[b]/sum(priors)
@@ -51,10 +52,12 @@ NormalizePriors <- function(priors) {
 }
 
 SimulateDataset <- function(means, std.devs, priors, sample.size) {
-  # Function that takes a vector of k means, a vector of k standard deviations,
-  # a vector of k priors, and a sample size n. It returns a vector of n simulated 
-  # observations taken from a population with k subpopulations (mean, sd and prior from input).
-  if (length(means) != length(std.devs) || length(means) != length(priors) || length(std.devs) != length(priors)) {
+  # Function that takes a vector of k means, a vector of k standard 
+  # deviations, a vector of k priors, and a sample size n. 
+  # It returns a vector of n simulated observations taken from a 
+  # population with k subpopulations (mean, sd and prior from input).
+  if (length(means) != length(std.devs) || length(means) != length(priors) 
+      || length(std.devs) != length(priors)) {
     stop("Not all parameters have been set.")
   }
   sample.dataset <- vector(mode="numeric", length=sample.size)
@@ -78,23 +81,37 @@ PlotSimulation <- function(data, means, std.devs, priors){
   # the subpopulations and total population
   priors      <- NormalizePriors(priors)
   x.vector    <- c(min(means) - max(std.devs) * 3, max(means) + max(std.devs) * 3)
-  colors.plot <- c("red4", "turquoise4", "darkgoldenrod2", "darkorchid4", "darkgreen", "darkorange1", "deeppink4", "springgreen4", "red3", "mediumvioletred")
+  colors.plot <- c("red4", "turquoise4", 
+                   "darkgoldenrod2", "darkorchid4", 
+                   "darkgreen", "darkorange1", 
+                   "deeppink4", "springgreen4", 
+                   "red3", "mediumvioletred")
   plot(1, type = "n", xlab = "", ylab = "", xlim = x.vector, ylim = c(0, 0.5))
   if (length(data) > 0) {  
     x.vector <- range(data)
-    hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of sample, and density graphs for populations", border = "grey80", col = "grey90")
+    hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, 
+         prob = TRUE, xlab = "Data values", border = "grey80", col = "grey90", 
+         main = "Histogram of sample, and density graphs for populations")
   }
   for (b in seq_along(means)) {
     if (b == 1) {
-      densities <- (dnorm(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), mean = means[b], sd = std.devs[b]) * priors[b])
-      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], add = TRUE, col = colors.plot[b])
+      densities <- (dnorm(seq(from = min(x.vector), to = max(x.vector), 
+                              by = (max(x.vector) - min(x.vector))/100), 
+                          mean = means[b], sd = std.devs[b]) * priors[b])
+      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], 
+            add = TRUE, col = colors.plot[b])
     }
     else {
-      densities <- densities + dnorm(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), mean = means[b], sd = std.devs[b]) * priors[b]
-      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], add = TRUE, col = colors.plot[b])
+      densities <- densities + dnorm(seq(from = min(x.vector), to = max(x.vector), 
+                                         by = (max(x.vector) - min(x.vector))/100), 
+                                     mean = means[b], sd = std.devs[b]) * priors[b]
+      curve(dnorm(x, mean = means[b], sd = std.devs[b]) * priors[b], 
+            add = TRUE, col = colors.plot[b])
     }
   }
-  lines(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), densities, type = "l")
+  lines(seq(from = min(x.vector), to = max(x.vector), 
+            by = (max(x.vector) - min(x.vector))/100), 
+        densities, type = "l")
 }
 
 # ***SIMPLE MIXTURE MODEL: Functions: InitiatePMembership, InitiateEstMeans,
@@ -102,8 +119,8 @@ PlotSimulation <- function(data, means, std.devs, priors){
 # ***CalculateEstMeans, CalculateEstVars and RunMixtureModel
 
 InitiatePMembership <- function(num.subpopulations, sample.size){
-  # Function that takes the wanted number of subpopulations (k) and sample size (n),
-  # and returns a matrix containing k rows of length n
+  # Function that takes the wanted number of subpopulations (k) and 
+  # sample size (n), and returns a matrix containing k rows of length n
   p.membership <- matrix(nrow = num.subpopulations, ncol = sample.size)
   return(p.membership)
 }
@@ -122,7 +139,7 @@ InitiateEstMeans <- function(num.subpopulations, data){
 InitiateEstVars <- function(num.subpopulations, data){
   # Function that takes the wanted number of subpopulations (k) and the data,
   # and returns a vector containing k random variances between
-  # 1% and 1/6th of the range of the data
+  # 1/100th and 1/6th of the range of the data
   est.vars   <- vector(mode = "numeric", length = num.subpopulations)
   range.data <- max(data) - min(data)
   for (b in 1:num.subpopulations) {
@@ -142,15 +159,18 @@ InitiateEstPriors <- function(num.subpopulations){
 }
 
 CalculatePMemberships <- function(data, est.vars, est.means, est.priors, p.membership) {
-  # Function that takes the data, and estimation of the prior, mean and 
-  # std.dev of a subpopulation, and the vector containing current probabilities of membership,
-  # and returns one vector of the old and one of the new probabilities that each value 
-  # belongs to any of the subpopulations
+  # Function that takes the data, and vectors of the estimations of the priors, 
+  # means and variances of each subpopulation, and the vector containing 
+  # current probabilities of membership, and returns one matrix of the new 
+  # probabilities that each value (columns) belongs to any of the 
+  # subpopulations (rows)
   p.value.given.pop <- vector(mode = "numeric", length = length(est.means))
   p.times.prior <- vector(mode = "numeric", length = length(est.means))
   for (x in seq_along(data)) {
     for (b in seq_along(est.means)) {
-      p.value.given.pop[b] <- (1 / (sqrt(2 * pi * est.vars[b]))) * exp(- (((data[x] - est.means[b]) ^ 2) / (2 * est.vars[b])))
+      p.value.given.pop[b] <- (1 / (sqrt(2 * pi * est.vars[b]))) * 
+                               exp(- (((data[x] - est.means[b]) ^ 2) 
+                                      / (2 * est.vars[b])))
       p.times.prior[b] <- est.priors[b] * p.value.given.pop[b]
     }
     for (b in seq_along(est.means)) {
@@ -175,9 +195,10 @@ CalculateEstMeans <- function(data, p.membership, est.means) {
 }
 
 CalculateEstVars <- function(data, p.membership, est.means, est.vars) {
-  # Function that takes the data, membership probability matrix, vector containing the 
-  # estimations of the means, and vector containing the old estimations of the std. devs
-  # and returns a vector containing the new estimations of the std. devs.
+  # Function that takes the data, membership probability matrix, vector 
+  # containing the estimations of the means, and vector containing the old 
+  # estimations of the variances and returns a vector containing the 
+  # new estimations of the variances
   rel.var <- vector(mode = "numeric", length = length(data))
   for (b in seq_along(est.vars)) {
     for (x in seq_along(data)) {
@@ -189,6 +210,10 @@ CalculateEstVars <- function(data, p.membership, est.means, est.vars) {
 }
 
 CalculateBIC <- function(data, est.means, p.membership){
+  # Function that takes a vector of the data values, a vector containing the 
+  # estimations of the means of each subpopulation, and a matrix containing
+  # the probabilities each data point belongs to each subpopulation, and
+  # returns the Bayesian Information Criterion for this model.
   likelihood <- 0
   for (x in seq_along(data)) {
     likelihood <- likelihood + log(sum(p.membership[,x]))
@@ -215,7 +240,8 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
   
   for (n in 1:max.times) {
     for (b in length(est.means)) {
-      if (est.means[b] < old.means[b] * 1.001 && est.means[b] > old.means[b] * 0.999 && est.vars[b] < old.vars[b] * 1.001 && est.vars[b] > old.vars[b] * 0.999){
+      if (est.means[b] < old.means[b] * 1.001 && est.means[b] > old.means[b] * 0.999 
+          && est.vars[b] < old.vars[b] * 1.001 && est.vars[b] > old.vars[b] * 0.999){
         converged[b] <- TRUE
       }
       else {
@@ -235,7 +261,9 @@ RunMixtureModel <- function(data, num.subpopulations, max.times){
   }
   BIC <- CalculateBIC(data, est.means, p.membership)
   
-  mixture.model <- list("est.means" = est.means, "est.vars" = est.vars, "est.priors" = est.priors, "p.membership" = p.membership, "BIC" = BIC)
+  mixture.model <- list("est.means" = est.means, "est.vars" = est.vars, 
+                        "est.priors" = est.priors, "p.membership" = p.membership, 
+                        "BIC" = BIC)
   
   return(mixture.model)
 }
@@ -247,18 +275,31 @@ PlotResults <- function(data, est.means, est.vars, est.priors){
   # containing estimations of the means, variances and priors
   # and produces a histogram of the data with density graphs for the
   # subpopulations and total population
-  colors.plot <- c("red4", "turquoise4", "darkgoldenrod2", "darkorchid4", "darkgreen", "darkorange1", "deeppink4", "springgreen4", "red3", "mediumvioletred")
-  hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, prob = TRUE, xlab = "Data values", main = "Histogram of Data, with Density Graphs for Subpopulations", border = "grey80", col = "grey90")
+  colors.plot <- c("red4", "turquoise4", 
+                   "darkgoldenrod2", "darkorchid4", 
+                   "darkgreen", "darkorange1", 
+                   "deeppink4", "springgreen4", 
+                   "red3", "mediumvioletred")
+  hist(data, breaks = length(data) / 3, xlim = range(data), ylim = NULL, 
+       prob = TRUE, xlab = "Data values", border = "grey80", col = "grey90",
+       main = "Histogram of Data, with Density Graphs for Subpopulations")
   x.vector <- range(data)
   for (b in seq_along(est.means)) {
     if (b == 1) {
-      densities <- (dnorm(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b])
-      curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], add = TRUE, col = colors.plot[b])
+      densities <- (dnorm(seq(from = min(x.vector), to = max(x.vector), 
+                              by = (max(x.vector) - min(x.vector))/100), 
+                          mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b])
+      curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], 
+            add = TRUE, col = colors.plot[b])
     }
     else {
-      densities <- densities + dnorm(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b]
-      curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], add = TRUE, col = colors.plot[b])
+      densities <- densities + dnorm(seq(from = min(x.vector), to = max(x.vector), 
+                                         by = (max(x.vector) - min(x.vector))/100), 
+                                     mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b]
+      curve(dnorm(x, mean = est.means[b], sd = sqrt(est.vars[b])) * est.priors[b], 
+            add = TRUE, col = colors.plot[b])
     }
   }
-  lines(seq(from = min(x.vector), to = max(x.vector), by = (max(x.vector) - min(x.vector))/100), densities, type = "l")
+  lines(seq(from = min(x.vector), to = max(x.vector), 
+            by = (max(x.vector) - min(x.vector))/100), densities, type = "l")
 }
