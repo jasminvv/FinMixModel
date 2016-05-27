@@ -146,7 +146,6 @@ CalculatePMemberships <- function(data, est.vars, est.means, est.priors, p.membe
   # std.dev of a subpopulation, and the vector containing current probabilities of membership,
   # and returns one vector of the old and one of the new probabilities that each value 
   # belongs to any of the subpopulations
-  old.p.membership <- p.membership
   p.value.given.pop <- vector(mode = "numeric", length = length(est.means))
   p.times.prior <- vector(mode = "numeric", length = length(est.means))
   for (x in seq_along(data)) {
