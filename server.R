@@ -22,8 +22,10 @@ function(input, output, session) {
     variables$sim.std.devs[length(variables$sim.std.devs) + 1] <- input$sim.std.dev
     variables$sim.priors[length(variables$sim.priors) + 1]     <- input$sim.prior
     variables$sim.data                                         <- vector(mode = "numeric", length = 0)
-    output$sim.table <- renderTable({data.frame(Mean = variables$sim.means, SD = variables$sim.std.devs, Prior = variables$sim.priors)})
-    output$sim.plot <- renderPlot({PlotSimulation(variables$sim.data, variables$sim.means, variables$sim.std.devs, variables$sim.priors)})
+    output$sim.table <- renderTable({data.frame(Mean = variables$sim.means, SD = variables$sim.std.devs, 
+                                                Prior = variables$sim.priors)})
+    output$sim.plot <- renderPlot({PlotSimulation(variables$sim.data, variables$sim.means, 
+                                                  variables$sim.std.devs, variables$sim.priors)})
   })
   observeEvent(input$sim.reset, {
     variables$sim.means     <- vector(mode = "numeric", length = 0)
@@ -36,22 +38,37 @@ function(input, output, session) {
     output$res.table <- renderTable({})
   })
   observeEvent(input$sim.sample, {
-    variables$sim.data <- SimulateDataset(variables$sim.means, variables$sim.std.devs, variables$sim.priors, input$sim.sample.size)
-    output$sim.plot <- renderPlot({PlotSimulation(variables$sim.data, variables$sim.means, variables$sim.std.devs, variables$sim.priors)})
+    variables$sim.data <- SimulateDataset(variables$sim.means, variables$sim.std.devs, 
+                                          variables$sim.priors, input$sim.sample.size)
+    output$sim.plot <- renderPlot({PlotSimulation(variables$sim.data, variables$sim.means, 
+                                                  variables$sim.std.devs, variables$sim.priors)})
   })
   observeEvent(input$sim.calculate, {
-    variables$mixture.model <- RunMixtureModel(variables$sim.data, input$sim.num.subpopulations, input$sim.max.times)
-    output$res.plot  <- renderPlot({PlotResults(variables$sim.data, variables$mixture.model$est.means, variables$mixture.model$est.vars, variables$mixture.model$est.priors)})
-    output$res.table <- renderTable({data.frame(Mean = variables$mixture.model$est.means, SD = sqrt(variables$mixture.model$est.vars), Prior = variables$mixture.model$est.priors)})
-    output$res.BIC <- renderUI({str <- HTML(paste("Bayesian Information Criterion:", variables$mixture.model$BIC))})
+    variables$mixture.model <- RunMixtureModel(variables$sim.data, input$sim.num.subpopulations, 
+                                               input$sim.max.times)
+    output$res.plot  <- renderPlot({PlotResults(variables$sim.data, variables$mixture.model$est.means, 
+                                                variables$mixture.model$est.vars, 
+                                                variables$mixture.model$est.priors)})
+    output$res.table <- renderTable({data.frame(Mean = variables$mixture.model$est.means, 
+                                                SD = sqrt(variables$mixture.model$est.vars), 
+                                                Prior = variables$mixture.model$est.priors)})
+    output$res.BIC <- renderUI({str <- HTML(paste("Bayesian Information Criterion:", 
+                                                  variables$mixture.model$BIC))})
     updateTabsetPanel(session, inputId = "tabs", selected = "res")  
   })
   observeEvent(input$data.calculate, {
     variables$user.data     <- ReadData(input$data.file[, "datapath"], input$data.file[, "name"])
-    variables$mixture.model <- RunMixtureModel(variables$user.data[, 1], input$data.num.subpopulations, input$data.max.times)
-    output$res.plot  <- renderPlot({PlotResults(variables$user.data[, 1], variables$mixture.model$est.means, variables$mixture.model$est.vars, variables$mixture.model$est.priors)})
-    output$res.table <- renderTable({data.frame(Mean = variables$mixture.model$est.means, SD = sqrt(variables$mixture.model$est.vars), Prior = variables$mixture.model$est.priors)})
-    output$res.BIC <- renderText({cat("Bayesian Information Criterion:\"", variables$mixture.model$BIC, "\"\n") })
+    variables$mixture.model <- RunMixtureModel(variables$user.data[, 1], input$data.num.subpopulations, 
+                                               input$data.max.times)
+    output$res.plot  <- renderPlot({PlotResults(variables$user.data[, 1], 
+                                                variables$mixture.model$est.means, 
+                                                variables$mixture.model$est.vars, 
+                                                variables$mixture.model$est.priors)})
+    output$res.table <- renderTable({data.frame(Mean = variables$mixture.model$est.means, 
+                                                SD = sqrt(variables$mixture.model$est.vars), 
+                                                Prior = variables$mixture.model$est.priors)})
+    output$res.BIC <- renderUI({str <- HTML(paste("Bayesian Information Criterion:", 
+                                                  variables$mixture.model$BIC))})
     updateTabsetPanel(session, inputId = "tabs", selected = "res") 
   })
 }

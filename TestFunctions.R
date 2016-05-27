@@ -1,3 +1,6 @@
+# This was used to test functions in between, by calling them with several
+# parameters. All last unused lines of code are commented.
+
 source("Functions.R")
 
 # prior.all <- c(1, 3, 6)
